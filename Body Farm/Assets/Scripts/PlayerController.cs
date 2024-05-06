@@ -8,7 +8,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private SpriteRenderer playerSprite;
     [SerializeField] private LayerMask grassLayer;
-    [SerializeField] private int stepsInGrass;  
+    [SerializeField] private int stepsInGrass;
+    [SerializeField] private int minStepsToEncounter;
+    [SerializeField] private int maxStepsToEncounter;
 
 
     private PlayerControls playerControls;
@@ -16,6 +18,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 movement;
     private bool movingInGrass;
     private float stepTimer;
+    private int stepsToEncounter;
 
 
     private const string IS_WALK_PARAM = "IsWalk";
@@ -25,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         playerControls = new PlayerControls();
+        CalculateStepsToEncounter();    
     }
 
     private void OnEnable()
@@ -77,6 +81,11 @@ public class PlayerController : MonoBehaviour
                 stepsInGrass++;
 
                 //check to see if we have reached an encounter to switch to battle scene
+                if(stepsInGrass >= stepsToEncounter)
+                {
+                    Debug.Log("Encounter");
+                    
+                }
             }
         }
         else
@@ -84,5 +93,10 @@ public class PlayerController : MonoBehaviour
             stepTimer = 0;
             stepsInGrass = 0;
         }
+    }
+
+    private void CalculateStepsToEncounter()
+    {
+        stepsToEncounter = Random.Range(minStepsToEncounter, maxStepsToEncounter);
     }
 }
