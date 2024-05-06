@@ -9,7 +9,7 @@ public class EnemyInfo : ScriptableObject
     public int BaseHealth;
     public int BaseStr;
     public int BaseInitiative;
-    public GameObject EnemyVisualprefab; // what will be displayed in battle scene
+    public GameObject EnemyVisualPrefab; // what will be displayed in battle scene
     
    
 }
