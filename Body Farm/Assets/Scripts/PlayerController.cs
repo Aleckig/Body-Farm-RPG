@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -22,7 +23,9 @@ public class PlayerController : MonoBehaviour
 
 
     private const string IS_WALK_PARAM = "IsWalk";
-    private const float timePerStep = 0.5f;
+    private const string BATTLE_SCENE = "BattleScene01";
+    private const float Time_Per_Step= 0.5f;
+    
 
 
     private void Awake()
@@ -75,7 +78,7 @@ public class PlayerController : MonoBehaviour
         if(movingInGrass == true)
         {
             stepTimer += Time.deltaTime;
-            if(stepTimer > timePerStep)
+            if(stepTimer > Time_Per_Step)
             {
                 stepTimer = 0;
                 stepsInGrass++;
@@ -83,7 +86,8 @@ public class PlayerController : MonoBehaviour
                 //check to see if we have reached an encounter to switch to battle scene
                 if(stepsInGrass >= stepsToEncounter)
                 {
-                    Debug.Log("Encounter");
+                    //Debug.Log("Encounter");
+                    SceneManager.LoadScene(BATTLE_SCENE);
                     
                 }
             }
