@@ -50,8 +50,8 @@ public class PartyMember
     public int MaxHealth; // Maximum health of the party member
     public int Strength; // Strength of the party member
     public int Iniative; // Initiative of the party member
-    public int CurrentEXP; // Current experience points of the party member (not used in this version)
-    public int MaxEXP; // Maximum experience points of the party member (not used in this version)
+    public int CurrentEXP; // Current experience points of the party member 
+    public int MaxEXP; // Maximum experience points of the party member 
     public GameObject MemberBattleVisualPrefab; // Prefab for the battle visual representation of the party member
     public GameObject MemberOverworldVisualPrefab; // Prefab for the overworld visual representation of the party member
 }
