@@ -21,10 +21,7 @@ public class BattleVisuals : MonoBehaviour
 
     void Start()
     {
-        animator = GetComponent<Animator>();
-        //healthBar = GetComponent<Slider>();
-        //levelText = GetComponent<TextMeshProUGUI>();
-        
+        animator = GetComponent<Animator>();   
     }
 
     public void SetStartingValues(int currentHealth, int maxHealth, int level)

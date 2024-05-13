@@ -1166,6 +1166,7 @@ GameObject:
   m_Component:
   - component: {fileID: 810499483}
   - component: {fileID: 810499482}
+  - component: {fileID: 810499484}
   m_Layer: 0
   m_Name: SlimeBattleVisual
   m_TagString: Untagged
@@ -1212,6 +1213,20 @@ Transform:
   - {fileID: 1986131972}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &810499484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810499481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bd79cc85e9dc0440b9ff857a1ceeb0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar: {fileID: 1232255743}
+  levelText: {fileID: 1447477345}
 --- !u!1 &916675826
 GameObject:
   m_ObjectHideFlags: 0
