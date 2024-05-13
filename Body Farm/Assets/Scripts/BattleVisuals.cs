@@ -12,13 +12,19 @@ public class BattleVisuals : MonoBehaviour
     private int currentHealth;
     private int maxHealth;
     private int level;
+    private Animator animator;
 
     private const string LEVEL_ABB = "Lvl:";
+    private const string IS_ATTACK_PARAM = "IsAttack";
+    private const string IS_HIT_PARAM = "IsHit";
+    private const string IS_DEAD_PARAM = "IsDead";
 
     void Start()
     {
-        healthBar = GetComponent<Slider>();
-        levelText = GetComponent<TextMeshProUGUI>();
+        animator = GetComponent<Animator>();
+        //healthBar = GetComponent<Slider>();
+        //levelText = GetComponent<TextMeshProUGUI>();
+        
     }
 
     public void SetStartingValues(int currentHealth, int maxHealth, int level)
@@ -34,6 +40,17 @@ public class BattleVisuals : MonoBehaviour
     public void ChangeHealth(int currentHealth)
     {
         this.currentHealth = currentHealth;
+
+        if(currentHealth <= 0)
+        {
+            PlayDeathAnimation();
+            Destroy(gameObject, 1.5f);
+        }
+        else
+        {
+            PlayHitAnimation();
+        }
+        UpdateHealthBar();
         
     }
     public void UpdateHealthBar()
@@ -41,6 +58,22 @@ public class BattleVisuals : MonoBehaviour
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
     }
+
+    public void PlayAttackAnimation()
+    {
+        animator.SetTrigger(IS_ATTACK_PARAM);
+    }
+
+    public void PlayHitAnimation()
+    {
+        animator.SetTrigger(IS_HIT_PARAM);
+    }
+
+    public void PlayDeathAnimation()
+    {
+        animator.SetTrigger(IS_DEAD_PARAM);
+    }
+
     
     
 }
