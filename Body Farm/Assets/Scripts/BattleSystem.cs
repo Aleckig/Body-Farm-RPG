@@ -13,7 +13,7 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] private List<BattleEntities> enemyBattlers = new List<BattleEntities>();
     [SerializeField] private List<BattleEntities> playerBattlers = new List<BattleEntities>();
 
-    
+
     private PartyManager partyManager;
     private EnemyManager enemyManager;
 
@@ -42,6 +42,16 @@ public class BattleSystem : MonoBehaviour
 
             //assign valeus to the new entity
             tempEntity.SetEntityValues(currentParty[i].MemberName, currentParty[i].Level, currentParty[i].MaxHealth, currentParty[i].CurrentHealth, currentParty[i].Strength, currentParty[i].Iniative, true);
+
+            //spawn the visuals for the party members
+            BattleVisuals tempBattleVisuals = Instantiate(currentParty[i].MemberBattleVisualPrefab, playerSpawnPoints[i].position, Quaternion.identity).GetComponent<BattleVisuals>();
+
+            //set UI visuals starting position
+            tempBattleVisuals.SetStartingValues(currentParty[i].MaxHealth,currentParty[i].MaxHealth, currentParty[i].Level);
+
+            //assign it to the battle enteties
+            tempEntity.BattleVisuals = tempBattleVisuals;
+
             
             allBattlers.Add(tempEntity);
             playerBattlers.Add(tempEntity);
@@ -63,6 +73,15 @@ public class BattleSystem : MonoBehaviour
 
             //assign values to the new entity
             tempEntity.SetEntityValues(currentEnemies[i].EnemyName, currentEnemies[i].Level, currentEnemies[i].MaxHealth, currentEnemies[i].CurrentHealth, currentEnemies[i].Strength, currentEnemies[i].Iniative, false);
+
+            //spawn the visuals for the enemies
+            BattleVisuals tempBattleVisuals = Instantiate(currentEnemies[i].EnemyVisualPrefab, enemySpawnPoints[i].position, Quaternion.identity).GetComponent<BattleVisuals>();
+
+            //set UI visuals starting position
+            tempBattleVisuals.SetStartingValues(currentEnemies[i].MaxHealth, currentEnemies[i].MaxHealth, currentEnemies[i].Level);
+
+            //assign it to the battle entities
+            tempEntity.BattleVisuals = tempBattleVisuals;
             
             allBattlers.Add(tempEntity);
             enemyBattlers.Add(tempEntity);
@@ -82,6 +101,7 @@ public class BattleEntities
     public int Strenght;
     public int Iniative;
     public bool IsPlayer;
+    public BattleVisuals BattleVisuals;
 
     public void SetEntityValues(string name, int level, int maxHealth, int currentHealth, int strenght, int iniative, bool isPlayer)
     {
