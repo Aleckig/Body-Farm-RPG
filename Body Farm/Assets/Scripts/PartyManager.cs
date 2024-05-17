@@ -38,6 +38,11 @@ public class PartyManager : MonoBehaviour
                 currentParty.Add(newPartyMember);
             }
         }
+    }
+
+    public List<PartyMember> GetCurrentParty()
+    {
+        return currentParty;
     }    
 }
 // Class to represent a party member
