@@ -546,7 +546,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 251315071}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 484467612}
+        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
+        m_MethodName: SelectEnemy
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &251315071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -831,7 +843,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 396587264}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 484467612}
+        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
+        m_MethodName: SelectEnemy
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &396587264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -876,6 +900,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8968335230596179278}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &484467612 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+    type: 3}
+  m_PrefabInstance: {fileID: 8642458925083859321}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37762e9387553fb448fa70c96bd4de2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &488383429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1027,7 +1063,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &488947757
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1048,7 +1084,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 250}
+  m_AnchoredPosition: {x: -543, y: -250}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &505604290
@@ -1273,7 +1309,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 624201595}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 484467612}
+        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
+        m_MethodName: SelectEnemy
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &624201595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1417,7 +1465,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 646100462}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 484467612}
+        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
+        m_MethodName: ShowEnemySelectionMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &646100462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3034,7 +3094,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2106742216
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3221,7 +3281,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
         type: 3}
+      propertyPath: actionText
+      value: 
+      objectReference: {fileID: 1446925955}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: battleMenu
+      value: 
+      objectReference: {fileID: 2106742215}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: enemySelectionMenu
+      value: 
+      objectReference: {fileID: 488947756}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
       propertyPath: enemySpawnPoints.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: partySpawnPoints.Array.size
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
@@ -3246,6 +3326,21 @@ PrefabInstance:
       objectReference: {fileID: 187453183}
     - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
         type: 3}
+      propertyPath: 'partySpawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 428478253}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: 'partySpawnPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 724240558}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: 'partySpawnPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 377033656}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
       propertyPath: 'playerSpawnPoints.Array.data[0]'
       value: 
       objectReference: {fileID: 428478253}
@@ -3259,6 +3354,26 @@ PrefabInstance:
       propertyPath: 'playerSpawnPoints.Array.data[2]'
       value: 
       objectReference: {fileID: 377033656}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: enemySelectionButtons.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: 'enemySelectionButtons.Array.data[0]'
+      value: 
+      objectReference: {fileID: 396587260}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: 'enemySelectionButtons.Array.data[1]'
+      value: 
+      objectReference: {fileID: 624201591}
+    - target: {fileID: 667234242285725693, guid: d84a4db07858a954790f802b7df09398,
+        type: 3}
+      propertyPath: 'enemySelectionButtons.Array.data[2]'
+      value: 
+      objectReference: {fileID: 251315067}
     - target: {fileID: 1174066658474137719, guid: d84a4db07858a954790f802b7df09398,
         type: 3}
       propertyPath: m_Name

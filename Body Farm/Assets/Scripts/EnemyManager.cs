@@ -30,7 +30,7 @@ public class EnemyManager : MonoBehaviour
                 newEnemy.MaxHealth = Mathf.RoundToInt(allEnemies[i].BaseHealth +(allEnemies[i].BaseHealth * levelModifier));
                 newEnemy.CurrentHealth = newEnemy.MaxHealth;
                 newEnemy.Strength = Mathf.RoundToInt(allEnemies[i].BaseStr +(allEnemies[i].BaseStr * levelModifier));
-                newEnemy.Iniative = Mathf.RoundToInt(allEnemies[i].BaseInitiative +(allEnemies[i].BaseInitiative * levelModifier));
+                newEnemy.Initiative = Mathf.RoundToInt(allEnemies[i].BaseInitiative +(allEnemies[i].BaseInitiative * levelModifier));
                 newEnemy.EnemyVisualPrefab = allEnemies[i].EnemyVisualPrefab;
                 
                 currentEnemies.Add(newEnemy);
@@ -56,7 +56,7 @@ public class Enemy
     public int CurrentHealth;
     public int MaxHealth;
     public int Strength;
-    public int Iniative;
+    public int Initiative;
     public GameObject EnemyVisualPrefab;
 
 }
