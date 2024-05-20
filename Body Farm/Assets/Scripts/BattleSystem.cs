@@ -22,6 +22,8 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] private GameObject battleMenu;
     [SerializeField] private GameObject enemySelectionMenu;
     [SerializeField] private TextMeshProUGUI actionText;
+    [SerializeField] private GameObject BattleTextPopup;
+    [SerializeField] private TextMeshProUGUI battleDamageText;
 
     // Managers for party and enemies
     private PartyManager partyManager;
@@ -43,9 +45,9 @@ public class BattleSystem : MonoBehaviour
         // Create entities for the party and enemies
         CreatePartyEntities();
         CreateEnemyEntities();
-
         // Show the battle menu initially
         ShowBattleMenu();
+        AttackAction(allBattlers[0], allBattlers[1]);
     }
 
     // Method to create party entities and set their initial values and visuals
@@ -187,6 +189,27 @@ public class BattleSystem : MonoBehaviour
             ShowBattleMenu();
         }
     }
+
+    private void AttackAction(BattleEntities currentAttacker, BattleEntities currentTarget)
+    {
+        // Calculate damage based on attacker's strength
+        int damage = currentAttacker.Strength;
+
+        //play attack animation
+        currentAttacker.BattleVisuals.PlayAttackAnimation();
+
+        // Reduce target's health by the damage amount
+        currentTarget.CurrentHealth -= damage;
+
+        //target play Hit animation
+        currentTarget.BattleVisuals.PlayHitAnimation();
+
+        // Update the target's health bar
+        currentTarget.UpdateUI();
+        battleDamageText.text = string.Format("{0} dealt {1} damage to {2}!", currentAttacker.Name, damage, currentTarget.Name);
+    }
+
+    
 }
 
 // Class representing a battle entity (player or enemy)
@@ -221,5 +244,10 @@ public class BattleEntities
     public void SetTarget(int target)
     {
         Target = target;
+    }
+
+    public void UpdateUI()
+    {
+        BattleVisuals.ChangeHealth(CurrentHealth);
     }
 }
