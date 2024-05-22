@@ -5,6 +5,11 @@ using TMPro;
 
 public class BattleSystem : MonoBehaviour
 {
+    [SerializeField] private enum BattleState { Start, Selection, Battle, Won, Lost, Run}
+    
+    [Header("Battle State")]
+    [SerializeField] private BattleState state;
+
     // Serialized fields for setting spawn points in the Unity Inspector
     [Header("Spawn Points")]
     [SerializeField] private Transform[] partySpawnPoints;
@@ -50,52 +55,88 @@ public class BattleSystem : MonoBehaviour
         AttackAction(allBattlers[0], allBattlers[1]);
     }
 
+    private IEnumerator BattleRoutine()
+    {
+        //enemy selection menu disabled
+        enemySelectionMenu.SetActive(false);
+        //change state to battle
+        state = BattleState.Battle;
+        //enable popup text
+        BattleTextPopup.SetActive(true);
+        
+        //loop through all battlers
+        for (int i = 0; i < allBattlers.Count; i++)
+        {
+            switch (allBattlers[i].BattleAction)
+            {
+                case BattleEntities.Action.Attack:
+                    //attack action
+                    Debug.Log("We are attacking: ");
+                    break;
+                case BattleEntities.Action.Run:
+                    break;
+                default:
+                    Debug.LogError("Invalid action selected.");
+                    break;
+            }
+        }
+
+        if(state == BattleState.Battle)
+        {
+            BattleTextPopup.SetActive(false);
+            ShowBattleMenu();
+            currentPlayer = 0;
+        }
+        yield return null;
+
+    }
+
     // Method to create party entities and set their initial values and visuals
     private void CreatePartyEntities()
-{
-    List<PartyMember> currentParty = partyManager.GetCurrentParty();
-
-    // Ensure we have enough spawn points
-    if (currentParty.Count > partySpawnPoints.Length)
     {
-        Debug.LogError("Not enough party spawn points for the current party members.");
-        return;
+        List<PartyMember> currentParty = partyManager.GetCurrentParty();
+
+        // Ensure we have enough spawn points
+        if (currentParty.Count > partySpawnPoints.Length)
+        {
+            Debug.LogError("Not enough party spawn points for the current party members.");
+            return;
+        }
+
+        for (int i = 0; i < currentParty.Count; i++)
+        {
+            BattleEntities tempEntity = new BattleEntities();
+
+            tempEntity.SetEntityValues(
+                currentParty[i].MemberName, 
+                currentParty[i].CurrentHealth, 
+                currentParty[i].MaxHealth,
+                currentParty[i].Initiative, 
+                currentParty[i].Strength, 
+                currentParty[i].Level, 
+                true
+            );
+
+            // Instantiate and set up battle visuals
+            BattleVisuals tempBattleVisuals = Instantiate(
+                currentParty[i].MemberBattleVisualPrefab,
+                partySpawnPoints[i].position, 
+                Quaternion.identity
+            ).GetComponent<BattleVisuals>();
+
+            tempBattleVisuals.SetStartingValues(
+                currentParty[i].MaxHealth, 
+                currentParty[i].MaxHealth, 
+                currentParty[i].Level
+            );
+
+            tempEntity.BattleVisuals = tempBattleVisuals;
+
+            // Add to lists for all battlers and player battlers
+            allBattlers.Add(tempEntity);
+            playerBattlers.Add(tempEntity);
+        }
     }
-
-    for (int i = 0; i < currentParty.Count; i++)
-    {
-        BattleEntities tempEntity = new BattleEntities();
-
-        tempEntity.SetEntityValues(
-            currentParty[i].MemberName, 
-            currentParty[i].CurrentHealth, 
-            currentParty[i].MaxHealth,
-            currentParty[i].Initiative, 
-            currentParty[i].Strength, 
-            currentParty[i].Level, 
-            true
-        );
-
-        // Instantiate and set up battle visuals
-        BattleVisuals tempBattleVisuals = Instantiate(
-            currentParty[i].MemberBattleVisualPrefab,
-            partySpawnPoints[i].position, 
-            Quaternion.identity
-        ).GetComponent<BattleVisuals>();
-
-        tempBattleVisuals.SetStartingValues(
-            currentParty[i].MaxHealth, 
-            currentParty[i].MaxHealth, 
-            currentParty[i].Level
-        );
-
-        tempEntity.BattleVisuals = tempBattleVisuals;
-
-        // Add to lists for all battlers and player battlers
-        allBattlers.Add(tempEntity);
-        playerBattlers.Add(tempEntity);
-    }
-}
 
 
     // Method to create enemy entities and set their initial values and visuals
@@ -179,7 +220,7 @@ public class BattleSystem : MonoBehaviour
         if (currentPlayer >= playerBattlers.Count)
         {
             // Start the battle if all players have selected an action
-            Debug.Log("Start the battle");
+            StartCoroutine(BattleRoutine());
             Debug.Log("We are attacking: " + allBattlers[currentPlayerEntity.Target].Name);
         }
         else
