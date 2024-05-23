@@ -52,7 +52,7 @@ public class BattleSystem : MonoBehaviour
         CreateEnemyEntities();
         // Show the battle menu initially
         ShowBattleMenu();
-        AttackAction(allBattlers[0], allBattlers[1]);
+        
     }
 
     private IEnumerator BattleRoutine()
@@ -71,7 +71,7 @@ public class BattleSystem : MonoBehaviour
             {
                 case BattleEntities.Action.Attack:
                     //attack action
-                    Debug.Log("We are attacking: ");
+                    Debug.Log(allBattlers[i].Name + "is attacking: " + allBattlers[allBattlers[i].Target].Name);
                     break;
                 case BattleEntities.Action.Run:
                     break;
@@ -84,8 +84,9 @@ public class BattleSystem : MonoBehaviour
         if(state == BattleState.Battle)
         {
             BattleTextPopup.SetActive(false);
-            ShowBattleMenu();
             currentPlayer = 0;
+            ShowBattleMenu();
+            
         }
         yield return null;
 
