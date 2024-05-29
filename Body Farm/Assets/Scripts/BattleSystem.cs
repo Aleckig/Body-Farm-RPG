@@ -29,6 +29,7 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI actionText;
     [SerializeField] private GameObject BattleTextPopup;
     [SerializeField] private TextMeshProUGUI battleDamageText;
+    
 
     // Managers for party and enemies
     private PartyManager partyManager;
@@ -39,6 +40,8 @@ public class BattleSystem : MonoBehaviour
 
     // Constant string for action message
     private const string ACTION_MESSAGE = "'s Action:";
+    private const string WIN_MESSAGE = "You won the battle!";
+    private const int TURN_DURATION = 2;
 
     // Start is called before the first frame update
     void Start()
@@ -71,7 +74,7 @@ public class BattleSystem : MonoBehaviour
             {
                 case BattleEntities.Action.Attack:
                     //attack action
-                    Debug.Log(allBattlers[i].Name + "is attacking: " + allBattlers[allBattlers[i].Target].Name);
+                    yield return StartCoroutine(AttackRoutine(i));
                     break;
                 case BattleEntities.Action.Run:
                     break;
@@ -137,6 +140,37 @@ public class BattleSystem : MonoBehaviour
             allBattlers.Add(tempEntity);
             playerBattlers.Add(tempEntity);
         }
+    }
+
+    private IEnumerator AttackRoutine(int i )
+    {
+        //check if the current battler is a player
+        if(allBattlers[i].IsPlayer == true)
+        {
+            BattleEntities currentAttacker = allBattlers[i];
+            BattleEntities currentTarget = allBattlers[currentAttacker.Target];
+            
+            AttackAction(currentAttacker, currentTarget);
+            yield return new WaitForSeconds(TURN_DURATION);
+
+            //kill the enemy
+            if (currentTarget.CurrentHealth <= 0)
+            {
+                enemyBattlers.Remove(currentTarget);
+                allBattlers.Remove(currentTarget);
+                //Destroy(currentTarget.BattleVisuals.gameObject);
+                if(enemyBattlers.Count <= 0)
+                {
+                    state = BattleState.Won;
+                    Debug.Log("You won the battle!");
+                    battleDamageText.text = WIN_MESSAGE;    
+
+                }
+            }
+
+
+        }
+        
     }
 
 
