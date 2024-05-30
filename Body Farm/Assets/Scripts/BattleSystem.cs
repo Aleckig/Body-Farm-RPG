@@ -156,14 +156,19 @@ public class BattleSystem : MonoBehaviour
             //kill the enemy
             if (currentTarget.CurrentHealth <= 0)
             {
+                battleDamageText.text = string.Format("{0} defeated {1}", currentAttacker, currentTarget.Name);
+                yield return new WaitForSeconds(TURN_DURATION);
                 enemyBattlers.Remove(currentTarget);
                 allBattlers.Remove(currentTarget);
                 //Destroy(currentTarget.BattleVisuals.gameObject);
                 if(enemyBattlers.Count <= 0)
                 {
                     state = BattleState.Won;
-                    Debug.Log("You won the battle!");
-                    battleDamageText.text = WIN_MESSAGE;    
+                    //Debug.Log("You won the battle!");
+                    battleDamageText.text = WIN_MESSAGE;
+                    yield return new WaitForSeconds(TURN_DURATION);
+                    //end the battle and switch scene
+
 
                 }
             }
