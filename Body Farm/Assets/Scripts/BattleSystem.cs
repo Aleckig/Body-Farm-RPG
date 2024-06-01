@@ -173,8 +173,14 @@ public class BattleSystem : MonoBehaviour
                 }
             }
 
-
         }
+        //enemies turn
+        //get random party member(target)
+        //attack selected memebers
+        //wait 
+        //kill the party member
+
+        //if no party members left == lost
         
     }
 
@@ -288,6 +294,38 @@ public class BattleSystem : MonoBehaviour
         // Update the target's health bar
         currentTarget.UpdateUI();
         battleDamageText.text = string.Format("{0} dealt {1} damage to {2}!", currentAttacker.Name, damage, currentTarget.Name);
+    }
+
+    private int GetRandomPartyMember()
+    {
+        //create temp list to store the index of the party members
+        List<int> partyMembers = new List<int>();
+        for (int i = 0; i < playerBattlers.Count; i++)
+        {
+            if(allBattlers[i].IsPlayer == true)
+            {
+                partyMembers.Add(i);
+            }
+            
+        }
+        //return a random party member
+        return partyMembers[Random.Range(0, partyMembers.Count)];
+    }
+
+    private int GetRandomEnemy()
+    {
+        //create temp list to store the index of the party members
+        List<int> enemies = new List<int>();
+        for (int i = 0; i < enemyBattlers.Count; i++)
+        {
+            if(allBattlers[i].IsPlayer == false)
+            {
+                enemies.Add(i);
+            }
+            
+        }
+        //return a random party member
+        return enemies[Random.Range(0, enemies.Count)];
     }
 
     
