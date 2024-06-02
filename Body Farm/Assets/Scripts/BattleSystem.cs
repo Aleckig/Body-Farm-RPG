@@ -5,8 +5,8 @@ using TMPro;
 
 public class BattleSystem : MonoBehaviour
 {
-    [SerializeField] private enum BattleState { Start, Selection, Battle, Won, Lost, Run}
-    
+    [SerializeField] private enum BattleState { Start, Selection, Battle, Won, Lost, Run }
+
     [Header("Battle State")]
     [SerializeField] private BattleState state;
 
@@ -29,7 +29,7 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI actionText;
     [SerializeField] private GameObject BattleTextPopup;
     [SerializeField] private TextMeshProUGUI battleDamageText;
-    
+
 
     // Managers for party and enemies
     private PartyManager partyManager;
@@ -41,6 +41,7 @@ public class BattleSystem : MonoBehaviour
     // Constant string for action message
     private const string ACTION_MESSAGE = "'s Action:";
     private const string WIN_MESSAGE = "You won the battle!";
+    private const string LOST_MESSAGE = "You lost the battle!";
     private const int TURN_DURATION = 2;
 
     // Start is called before the first frame update
@@ -55,7 +56,7 @@ public class BattleSystem : MonoBehaviour
         CreateEnemyEntities();
         // Show the battle menu initially
         ShowBattleMenu();
-        
+
     }
 
     private IEnumerator BattleRoutine()
@@ -66,7 +67,7 @@ public class BattleSystem : MonoBehaviour
         state = BattleState.Battle;
         //enable popup text
         BattleTextPopup.SetActive(true);
-        
+
         //loop through all battlers
         for (int i = 0; i < allBattlers.Count; i++)
         {
@@ -84,12 +85,12 @@ public class BattleSystem : MonoBehaviour
             }
         }
 
-        if(state == BattleState.Battle)
+        if (state == BattleState.Battle)
         {
             BattleTextPopup.SetActive(false);
             currentPlayer = 0;
             ShowBattleMenu();
-            
+
         }
         yield return null;
 
@@ -112,25 +113,25 @@ public class BattleSystem : MonoBehaviour
             BattleEntities tempEntity = new BattleEntities();
 
             tempEntity.SetEntityValues(
-                currentParty[i].MemberName, 
-                currentParty[i].CurrentHealth, 
+                currentParty[i].MemberName,
+                currentParty[i].CurrentHealth,
                 currentParty[i].MaxHealth,
-                currentParty[i].Initiative, 
-                currentParty[i].Strength, 
-                currentParty[i].Level, 
+                currentParty[i].Initiative,
+                currentParty[i].Strength,
+                currentParty[i].Level,
                 true
             );
 
             // Instantiate and set up battle visuals
             BattleVisuals tempBattleVisuals = Instantiate(
                 currentParty[i].MemberBattleVisualPrefab,
-                partySpawnPoints[i].position, 
+                partySpawnPoints[i].position,
                 Quaternion.identity
             ).GetComponent<BattleVisuals>();
 
             tempBattleVisuals.SetStartingValues(
-                currentParty[i].MaxHealth, 
-                currentParty[i].MaxHealth, 
+                currentParty[i].MaxHealth,
+                currentParty[i].MaxHealth,
                 currentParty[i].Level
             );
 
@@ -142,14 +143,19 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
-    private IEnumerator AttackRoutine(int i )
+    private IEnumerator AttackRoutine(int i)
     {
         //check if the current battler is a player
-        if(allBattlers[i].IsPlayer == true)
+        if (allBattlers[i].IsPlayer == true)
         {
             BattleEntities currentAttacker = allBattlers[i];
-            BattleEntities currentTarget = allBattlers[currentAttacker.Target];
+            if(allBattlers[currentAttacker.Target].IsPlayer == true || currentAttacker.Target >= playerBattlers.Count)
+            {
+                currentAttacker.SetTarget(GetRandomEnemy());
+            }
             
+            BattleEntities currentTarget = allBattlers[currentAttacker.Target];
+
             AttackAction(currentAttacker, currentTarget);
             yield return new WaitForSeconds(TURN_DURATION);
 
@@ -161,7 +167,7 @@ public class BattleSystem : MonoBehaviour
                 enemyBattlers.Remove(currentTarget);
                 allBattlers.Remove(currentTarget);
                 //Destroy(currentTarget.BattleVisuals.gameObject);
-                if(enemyBattlers.Count <= 0)
+                if (enemyBattlers.Count <= 0)
                 {
                     state = BattleState.Won;
                     //Debug.Log("You won the battle!");
@@ -175,13 +181,36 @@ public class BattleSystem : MonoBehaviour
 
         }
         //enemies turn
-        //get random party member(target)
-        //attack selected memebers
-        //wait 
-        //kill the party member
+        if(allBattlers[i].IsPlayer == false)
+        {
+            BattleEntities currentAttacker = allBattlers[i];
+            //get random party member(target)
+            currentAttacker.SetTarget(GetRandomPartyMember());
+            BattleEntities currentTarget = allBattlers[currentAttacker.Target];
 
-        //if no party members left == lost
+            AttackAction(currentAttacker, currentTarget);//attack selected memebers
+            yield return new WaitForSeconds(TURN_DURATION);
+            if (currentTarget.CurrentHealth <= 0)
+            {
+                battleDamageText.text = string.Format("{0} defeated {1}", currentAttacker, currentTarget.Name);
+                yield return new WaitForSeconds(TURN_DURATION);
+                playerBattlers.Remove(currentTarget);
+                allBattlers.Remove(currentTarget);
+                //Destroy(currentTarget.BattleVisuals.gameObject);
+                if (playerBattlers.Count <= 0)
+                {
+                    state = BattleState.Lost;
+                    //Debug.Log("You lost the battle!");
+                    battleDamageText.text = LOST_MESSAGE;
+                    yield return new WaitForSeconds(TURN_DURATION);
+                    //end the battle and switch scene
+                }
+            }
+
+        }
         
+        
+
     }
 
 
@@ -302,11 +331,11 @@ public class BattleSystem : MonoBehaviour
         List<int> partyMembers = new List<int>();
         for (int i = 0; i < playerBattlers.Count; i++)
         {
-            if(allBattlers[i].IsPlayer == true)
+            if (allBattlers[i].IsPlayer == true)
             {
                 partyMembers.Add(i);
             }
-            
+
         }
         //return a random party member
         return partyMembers[Random.Range(0, partyMembers.Count)];
@@ -318,17 +347,17 @@ public class BattleSystem : MonoBehaviour
         List<int> enemies = new List<int>();
         for (int i = 0; i < enemyBattlers.Count; i++)
         {
-            if(allBattlers[i].IsPlayer == false)
+            if (allBattlers[i].IsPlayer == false)
             {
                 enemies.Add(i);
             }
-            
+
         }
         //return a random party member
         return enemies[Random.Range(0, enemies.Count)];
     }
 
-    
+
 }
 
 // Class representing a battle entity (player or enemy)
