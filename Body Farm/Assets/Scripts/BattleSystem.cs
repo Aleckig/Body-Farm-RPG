@@ -71,18 +71,23 @@ public class BattleSystem : MonoBehaviour
         //loop through all battlers
         for (int i = 0; i < allBattlers.Count; i++)
         {
-            switch (allBattlers[i].BattleAction)
+            if(state == BattleState.Battle)
             {
-                case BattleEntities.Action.Attack:
-                    //attack action
-                    yield return StartCoroutine(AttackRoutine(i));
-                    break;
-                case BattleEntities.Action.Run:
-                    break;
-                default:
-                    Debug.LogError("Invalid action selected.");
-                    break;
+                switch (allBattlers[i].BattleAction)
+                {
+                    case BattleEntities.Action.Attack:
+                        //attack action
+                        yield return StartCoroutine(AttackRoutine(i));
+                        break;
+                    case BattleEntities.Action.Run:
+                        break;
+                    default:
+                        Debug.LogError("Invalid action selected.");
+                        break;
+                }
+
             }
+            
         }
 
         if (state == BattleState.Battle)
