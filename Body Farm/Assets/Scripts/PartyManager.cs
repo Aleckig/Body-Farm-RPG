@@ -6,12 +6,26 @@ public class PartyManager : MonoBehaviour
 {
     [SerializeField] private PartyMemberInfo[] allMembers; // Array to store information about all party members
     [SerializeField] private List<PartyMember> currentParty; // List to store information about current party members
-    [SerializeField] private PartyMemberInfo defualtPartyMember; // Default party member to add to the party
+    [SerializeField] private PartyMemberInfo defaultPartyMember; // Default party member to add to the party
+
+    private Vector3 playerPosition; // Position of the player in the overworld
+    private static GameObject instance; // Singleton instance of the PartyManager
 
     private void Awake()
     {
-        // Add the default party member to the party when the game starts
-        AddMemberToPartyByName(defualtPartyMember.MemberName);
+        AddMemberToPartyByName(defaultPartyMember.MemberName);
+        if (instance != null)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            instance = this.gameObject;
+            AddMemberToPartyByName(defaultPartyMember.MemberName);
+        }
+
+        DontDestroyOnLoad(gameObject);
+
     }
 
     // Method to add a member to the party by name
@@ -43,7 +57,22 @@ public class PartyManager : MonoBehaviour
     public List<PartyMember> GetCurrentParty()
     {
         return currentParty;
-    }    
+    }
+    public void SaveHealth(int partyMember, int health)
+    {
+        currentParty[partyMember].CurrentHealth = health;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        playerPosition = position;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return playerPosition;
+    }
+    
 }
 // Class to represent a party member
 [System.Serializable]

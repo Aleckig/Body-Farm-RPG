@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class BattleSystem : MonoBehaviour
 {
@@ -10,260 +11,214 @@ public class BattleSystem : MonoBehaviour
     [Header("Battle State")]
     [SerializeField] private BattleState state;
 
-    // Serialized fields for setting spawn points in the Unity Inspector
     [Header("Spawn Points")]
     [SerializeField] private Transform[] partySpawnPoints;
     [SerializeField] private Transform[] enemySpawnPoints;
 
-    // Lists to manage different battlers (all, enemies, and players)
     [Header("Battlers")]
     [SerializeField] private List<BattleEntities> allBattlers = new List<BattleEntities>();
     [SerializeField] private List<BattleEntities> enemyBattlers = new List<BattleEntities>();
     [SerializeField] private List<BattleEntities> playerBattlers = new List<BattleEntities>();
 
-    // UI elements for managing battle menus and action texts
     [Header("UI")]
     [SerializeField] private GameObject[] enemySelectionButtons;
     [SerializeField] private GameObject battleMenu;
     [SerializeField] private GameObject enemySelectionMenu;
     [SerializeField] private TextMeshProUGUI actionText;
-    [SerializeField] private GameObject BattleTextPopup;
-    [SerializeField] private TextMeshProUGUI battleDamageText;
+    [SerializeField] private GameObject bottomTextPopUp;
+    [SerializeField] private TextMeshProUGUI bottomText;
 
-
-    // Managers for party and enemies
     private PartyManager partyManager;
     private EnemyManager enemyManager;
-
-    // Index to track the current player making a decision
     private int currentPlayer;
 
-    // Constant string for action message
     private const string ACTION_MESSAGE = "'s Action:";
-    private const string WIN_MESSAGE = "You won the battle!";
-    private const string LOST_MESSAGE = "You lost the battle!";
+    private const string WIN_MESSAGE = "Your party won the battle";
+    private const string LOSE_MESSAGE = "Your party has been defeated";
     private const int TURN_DURATION = 2;
+    private const string OVERWORLD_SCENE = "TestScene";
 
     // Start is called before the first frame update
     void Start()
     {
-        // Find and set references to party and enemy managers
         partyManager = GameObject.FindFirstObjectByType<PartyManager>();
         enemyManager = GameObject.FindFirstObjectByType<EnemyManager>();
 
-        // Create entities for the party and enemies
         CreatePartyEntities();
         CreateEnemyEntities();
-        // Show the battle menu initially
         ShowBattleMenu();
 
     }
 
     private IEnumerator BattleRoutine()
     {
-        //enemy selection menu disabled
-        enemySelectionMenu.SetActive(false);
-        //change state to battle
-        state = BattleState.Battle;
-        //enable popup text
-        BattleTextPopup.SetActive(true);
+        enemySelectionMenu.SetActive(false); // enemy selection menu disabled
+        state = BattleState.Battle; // change our state to the battle state
+        bottomTextPopUp.SetActive(true); //enable our bottom text
 
-        //loop through all battlers
+        //loop through all our battlers
+        //-> do their approriate action
+
         for (int i = 0; i < allBattlers.Count; i++)
         {
-            if(state == BattleState.Battle)
+            if (state == BattleState.Battle)
             {
                 switch (allBattlers[i].BattleAction)
                 {
                     case BattleEntities.Action.Attack:
-                        //attack action
+                        // do the attack
                         yield return StartCoroutine(AttackRoutine(i));
                         break;
                     case BattleEntities.Action.Run:
+                        // run
                         break;
                     default:
-                        Debug.LogError("Invalid action selected.");
+                        Debug.Log("Error - incorrect battle action");
                         break;
                 }
-
             }
-            
         }
 
         if (state == BattleState.Battle)
         {
-            BattleTextPopup.SetActive(false);
+            bottomTextPopUp.SetActive(false);
             currentPlayer = 0;
             ShowBattleMenu();
 
         }
+
         yield return null;
+        // if we havent won or lost, repeat the loop by opening the battle menu
+    }
+
+    private IEnumerator AttackRoutine(int i)
+    {
+
+        // players turn
+        if (allBattlers[i].IsPlayer == true)
+        {
+            BattleEntities currAttacker = allBattlers[i];
+            if (allBattlers[currAttacker.Target].IsPlayer == true || currAttacker.Target >= allBattlers.Count)
+            {
+                currAttacker.SetTarget(GetRandomEnemy());
+            }
+            BattleEntities currentTarget = allBattlers[currAttacker.Target];
+            AttackAction(currAttacker, currentTarget); // attack selected enemy (attack action)
+            yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
+
+            // kill the enemy
+            if (currentTarget.CurrentHealth <= 0)
+            {
+                bottomText.text = string.Format("{0} defeated {1}", currAttacker.Name, currentTarget.Name);
+                yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
+                enemyBattlers.Remove(currentTarget);
+                allBattlers.Remove(currentTarget);
+
+                if (enemyBattlers.Count <= 0)
+                {
+                    state = BattleState.Won;
+                    bottomText.text = WIN_MESSAGE;
+                    yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
+                    SceneManager.LoadScene(OVERWORLD_SCENE);
+                }
+            }
+            // if no enemies remain
+            // -> we won the battle
+        }
+
+
+
+        //enemies turn
+        if (allBattlers[i].IsPlayer == false)
+        {
+            BattleEntities currAttacker = allBattlers[i];
+            currAttacker.SetTarget(GetRandomPartyMember());// get random party member (target)
+            BattleEntities currTarget = allBattlers[currAttacker.Target];
+
+            AttackAction(currAttacker, currTarget);// attack selected party member (attack action)
+            yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
+
+            if (currTarget.CurrentHealth <= 0)
+            {
+                // kill the party member
+                bottomText.text = string.Format("{0} defeated {1}", currAttacker.Name, currTarget.Name);
+                yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
+                playerBattlers.Remove(currTarget);
+                allBattlers.Remove(currTarget);
+
+                if (playerBattlers.Count <= 0) // if no party members remain
+                {
+                    // -> we lost the battle
+                    state = BattleState.Lost;
+                    bottomText.text = LOSE_MESSAGE;
+                    yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
+                    Debug.Log("Game Over");
+                }
+
+            }
+
+
+
+        }
+
+
 
     }
 
-    // Method to create party entities and set their initial values and visuals
     private void CreatePartyEntities()
     {
-        List<PartyMember> currentParty = partyManager.GetCurrentParty();
-
-        // Ensure we have enough spawn points
-        if (currentParty.Count > partySpawnPoints.Length)
-        {
-            Debug.LogError("Not enough party spawn points for the current party members.");
-            return;
-        }
+        List<PartyMember> currentParty = new List<PartyMember>();
+        currentParty = partyManager.GetCurrentParty();
 
         for (int i = 0; i < currentParty.Count; i++)
         {
             BattleEntities tempEntity = new BattleEntities();
 
-            tempEntity.SetEntityValues(
-                currentParty[i].MemberName,
-                currentParty[i].CurrentHealth,
-                currentParty[i].MaxHealth,
-                currentParty[i].Initiative,
-                currentParty[i].Strength,
-                currentParty[i].Level,
-                true
-            );
+            tempEntity.SetEntityValues(currentParty[i].MemberName, currentParty[i].CurrentHealth, currentParty[i].MaxHealth,
+            currentParty[i].Initiative, currentParty[i].Strength, currentParty[i].Level, true);
 
-            // Instantiate and set up battle visuals
-            BattleVisuals tempBattleVisuals = Instantiate(
-                currentParty[i].MemberBattleVisualPrefab,
-                partySpawnPoints[i].position,
-                Quaternion.identity
-            ).GetComponent<BattleVisuals>();
-
-            tempBattleVisuals.SetStartingValues(
-                currentParty[i].MaxHealth,
-                currentParty[i].MaxHealth,
-                currentParty[i].Level
-            );
-
+            BattleVisuals tempBattleVisuals = Instantiate(currentParty[i].MemberBattleVisualPrefab,
+            partySpawnPoints[i].position, Quaternion.identity).GetComponent<BattleVisuals>();
+            tempBattleVisuals.SetStartingValues(currentParty[i].CurrentHealth, currentParty[i].MaxHealth, currentParty[i].Level);
             tempEntity.BattleVisuals = tempBattleVisuals;
 
-            // Add to lists for all battlers and player battlers
             allBattlers.Add(tempEntity);
             playerBattlers.Add(tempEntity);
         }
-    }
 
-    private IEnumerator AttackRoutine(int i)
-    {
-        //check if the current battler is a player
-        if (allBattlers[i].IsPlayer == true)
-        {
-            BattleEntities currentAttacker = allBattlers[i];
-            if(allBattlers[currentAttacker.Target].IsPlayer == true || currentAttacker.Target >= playerBattlers.Count)
-            {
-                currentAttacker.SetTarget(GetRandomEnemy());
-            }
-            
-            BattleEntities currentTarget = allBattlers[currentAttacker.Target];
-
-            AttackAction(currentAttacker, currentTarget);
-            yield return new WaitForSeconds(TURN_DURATION);
-
-            //kill the enemy
-            if (currentTarget.CurrentHealth <= 0)
-            {
-                battleDamageText.text = string.Format("{0} defeated {1}", currentAttacker, currentTarget.Name);
-                yield return new WaitForSeconds(TURN_DURATION);
-                enemyBattlers.Remove(currentTarget);
-                allBattlers.Remove(currentTarget);
-                //Destroy(currentTarget.BattleVisuals.gameObject);
-                if (enemyBattlers.Count <= 0)
-                {
-                    state = BattleState.Won;
-                    //Debug.Log("You won the battle!");
-                    battleDamageText.text = WIN_MESSAGE;
-                    yield return new WaitForSeconds(TURN_DURATION);
-                    //end the battle and switch scene
-
-
-                }
-            }
-
-        }
-        //enemies turn
-        if(allBattlers[i].IsPlayer == false)
-        {
-            BattleEntities currentAttacker = allBattlers[i];
-            //get random party member(target)
-            currentAttacker.SetTarget(GetRandomPartyMember());
-            BattleEntities currentTarget = allBattlers[currentAttacker.Target];
-
-            AttackAction(currentAttacker, currentTarget);//attack selected memebers
-            yield return new WaitForSeconds(TURN_DURATION);
-            if (currentTarget.CurrentHealth <= 0)
-            {
-                battleDamageText.text = string.Format("{0} defeated {1}", currentAttacker, currentTarget.Name);
-                yield return new WaitForSeconds(TURN_DURATION);
-                playerBattlers.Remove(currentTarget);
-                allBattlers.Remove(currentTarget);
-                //Destroy(currentTarget.BattleVisuals.gameObject);
-                if (playerBattlers.Count <= 0)
-                {
-                    state = BattleState.Lost;
-                    //Debug.Log("You lost the battle!");
-                    battleDamageText.text = LOST_MESSAGE;
-                    yield return new WaitForSeconds(TURN_DURATION);
-                    //end the battle and switch scene
-                }
-            }
-
-        }
-        
-        
 
     }
 
-
-    // Method to create enemy entities and set their initial values and visuals
     private void CreateEnemyEntities()
     {
-        List<Enemy> currentEnemies = enemyManager.GetCurrentEnemies();
+        List<Enemy> currentEnemies = new List<Enemy>();
+        currentEnemies = enemyManager.GetCurrentEnemies();
+
         for (int i = 0; i < currentEnemies.Count; i++)
         {
             BattleEntities tempEntity = new BattleEntities();
-            tempEntity.SetEntityValues(
-                currentEnemies[i].EnemyName,
-                currentEnemies[i].CurrentHealth,
-                currentEnemies[i].MaxHealth,
-                currentEnemies[i].Initiative,
-                currentEnemies[i].Strength,
-                currentEnemies[i].Level,
-                false
-            );
 
-            BattleVisuals tempBattleVisuals = Instantiate(
-                currentEnemies[i].EnemyVisualPrefab,
-                enemySpawnPoints[i].position,
-                Quaternion.identity
-            ).GetComponent<BattleVisuals>();
+            tempEntity.SetEntityValues(currentEnemies[i].EnemyName, currentEnemies[i].CurrentHealth, currentEnemies[i].MaxHealth,
+            currentEnemies[i].Initiative, currentEnemies[i].Strength, currentEnemies[i].Level, false);
 
-            tempBattleVisuals.SetStartingValues(
-                currentEnemies[i].MaxHealth,
-                currentEnemies[i].MaxHealth,
-                currentEnemies[i].Level
-            );
-
+            BattleVisuals tempBattleVisuals = Instantiate(currentEnemies[i].EnemyVisualPrefab,
+            enemySpawnPoints[i].position, Quaternion.identity).GetComponent<BattleVisuals>();
+            tempBattleVisuals.SetStartingValues(currentEnemies[i].MaxHealth, currentEnemies[i].MaxHealth, currentEnemies[i].Level);
             tempEntity.BattleVisuals = tempBattleVisuals;
 
-            // Add to lists for all battlers and enemy battlers
             allBattlers.Add(tempEntity);
             enemyBattlers.Add(tempEntity);
         }
+
     }
 
-    // Method to show the battle menu for the current player
     public void ShowBattleMenu()
     {
         actionText.text = playerBattlers[currentPlayer].Name + ACTION_MESSAGE;
         battleMenu.SetActive(true);
+
     }
 
-    // Method to show the enemy selection menu
     public void ShowEnemySelectionMenu()
     {
         battleMenu.SetActive(false);
@@ -271,106 +226,103 @@ public class BattleSystem : MonoBehaviour
         enemySelectionMenu.SetActive(true);
     }
 
-    // Method to set up enemy selection buttons based on available enemies
     private void SetEnemySelectionButtons()
     {
-        // Disable all enemy selection buttons initially
+        //disable all of our buttons
         for (int i = 0; i < enemySelectionButtons.Length; i++)
         {
             enemySelectionButtons[i].SetActive(false);
         }
 
-        // Enable buttons and set their text for each enemy
         for (int j = 0; j < enemyBattlers.Count; j++)
         {
             enemySelectionButtons[j].SetActive(true);
             enemySelectionButtons[j].GetComponentInChildren<TextMeshProUGUI>().text = enemyBattlers[j].Name;
         }
+        //enable buttons for each enemy
+        // change the buttons text 
     }
 
-    // Method to handle enemy selection by the current player
     public void SelectEnemy(int currentEnemy)
     {
+        // setting the current members target
         BattleEntities currentPlayerEntity = playerBattlers[currentPlayer];
         currentPlayerEntity.SetTarget(allBattlers.IndexOf(enemyBattlers[currentEnemy]));
-        currentPlayerEntity.BattleAction = BattleEntities.Action.Attack;
 
+        //tell the battle system this member intends to attack
+        currentPlayerEntity.BattleAction = BattleEntities.Action.Attack;
+        // increment through our party members
         currentPlayer++;
 
-        if (currentPlayer >= playerBattlers.Count)
+        if (currentPlayer >= playerBattlers.Count) //if all players have selected an action
         {
-            // Start the battle if all players have selected an action
+            //Start The Battle
             StartCoroutine(BattleRoutine());
-            Debug.Log("We are attacking: " + allBattlers[currentPlayerEntity.Target].Name);
+
         }
         else
         {
-            // Show the battle menu for the next player
-            enemySelectionMenu.SetActive(false);
+            enemySelectionMenu.SetActive(false);  // show the battle menu for the next player
             ShowBattleMenu();
         }
+
+
     }
 
-    private void AttackAction(BattleEntities currentAttacker, BattleEntities currentTarget)
+    private void AttackAction(BattleEntities currAttacker, BattleEntities currTarget)
     {
-        // Calculate damage based on attacker's strength
-        int damage = currentAttacker.Strength;
-
-        //play attack animation
-        currentAttacker.BattleVisuals.PlayAttackAnimation();
-
-        // Reduce target's health by the damage amount
-        currentTarget.CurrentHealth -= damage;
-
-        //target play Hit animation
-        currentTarget.BattleVisuals.PlayHitAnimation();
-
-        // Update the target's health bar
-        currentTarget.UpdateUI();
-        battleDamageText.text = string.Format("{0} dealt {1} damage to {2}!", currentAttacker.Name, damage, currentTarget.Name);
+        int damage = currAttacker.Strength; //get damage (can use an algorithm)
+        currAttacker.BattleVisuals.PlayAttackAnimation(); // play the attack animation
+        currTarget.CurrentHealth -= damage; // dealing the damage
+        currTarget.BattleVisuals.PlayHitAnimation(); // play their hit anim
+        currTarget.UpdateUI(); // update the UI
+        bottomText.text = string.Format("{0} attacks {1} for {2} damage", currAttacker.Name, currTarget.Name, damage);
+        SaveHealth();
     }
+
 
     private int GetRandomPartyMember()
     {
-        //create temp list to store the index of the party members
-        List<int> partyMembers = new List<int>();
-        for (int i = 0; i < playerBattlers.Count; i++)
+        List<int> partyMembers = new List<int>(); // create a temporary list of type int (index)
+        // find all the party members -> add them to our list
+        for (int i = 0; i < allBattlers.Count; i++)
         {
-            if (allBattlers[i].IsPlayer == true)
+            if (allBattlers[i].IsPlayer == true) // we have a party member
             {
                 partyMembers.Add(i);
             }
-
         }
-        //return a random party member
-        return partyMembers[Random.Range(0, partyMembers.Count)];
+        return partyMembers[Random.Range(0, partyMembers.Count)];// return a random party member
     }
 
     private int GetRandomEnemy()
     {
-        //create temp list to store the index of the party members
         List<int> enemies = new List<int>();
-        for (int i = 0; i < enemyBattlers.Count; i++)
+        for (int i = 0; i < allBattlers.Count; i++)
         {
             if (allBattlers[i].IsPlayer == false)
             {
                 enemies.Add(i);
             }
-
         }
-        //return a random party member
         return enemies[Random.Range(0, enemies.Count)];
     }
 
-
+    private void SaveHealth()
+    {
+        for (int i = 0; i < playerBattlers.Count; i++)
+        {
+            partyManager.SaveHealth(i, playerBattlers[i].CurrentHealth);
+        }
+    }
 }
 
-// Class representing a battle entity (player or enemy)
 [System.Serializable]
 public class BattleEntities
 {
     public enum Action { Attack, Run }
     public Action BattleAction;
+
     public string Name;
     public int CurrentHealth;
     public int MaxHealth;
@@ -381,7 +333,6 @@ public class BattleEntities
     public BattleVisuals BattleVisuals;
     public int Target;
 
-    // Method to set initial values for the entity
     public void SetEntityValues(string name, int currHealth, int maxHealth, int initiative, int strength, int level, bool isPlayer)
     {
         Name = name;
@@ -393,7 +344,6 @@ public class BattleEntities
         IsPlayer = isPlayer;
     }
 
-    // Method to set the target for an action
     public void SetTarget(int target)
     {
         Target = target;
@@ -403,4 +353,5 @@ public class BattleEntities
     {
         BattleVisuals.ChangeHealth(CurrentHealth);
     }
+
 }

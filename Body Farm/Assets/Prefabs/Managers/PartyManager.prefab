@@ -47,4 +47,4 @@ MonoBehaviour:
   allMembers:
   - {fileID: 11400000, guid: 5b9c5614652b5874899e56f76bb9b007, type: 2}
   currentParty: []
-  defualtPartyMember: {fileID: 11400000, guid: 5b9c5614652b5874899e56f76bb9b007, type: 2}
+  defaultPartyMember: {fileID: 11400000, guid: 5b9c5614652b5874899e56f76bb9b007, type: 2}
