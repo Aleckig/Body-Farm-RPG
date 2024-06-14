@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private bool movingInGrass; // Flag indicating if the player is moving in grass
     private float stepTimer; // Timer for tracking steps taken in grass
     private int stepsToEncounter; // Number of steps required to trigger an encounter
+    private PartyManager partyManager; // Reference to the PartyManager script 
 
     private const string IS_WALK_PARAM = "IsWalk"; // Animator parameter for controlling walk animation
     private const string BATTLE_SCENE = "BattleScene01"; // Name of the battle scene
@@ -43,6 +44,16 @@ public class PlayerController : MonoBehaviour
     {
         // Get Rigidbody component
         rb = gameObject.GetComponent<Rigidbody>();
+        // Get PartyManager script reference
+        partyManager = GameObject.FindFirstObjectByType<PartyManager>();
+        //move player to the saved position
+        if(partyManager.GetPosition() != Vector3.zero)
+        {
+            transform.position = partyManager.GetPosition();
+        }
+        
+            
+        
     }
 
     void Update()
@@ -90,6 +101,7 @@ public class PlayerController : MonoBehaviour
                 // Check if the required number of steps has been taken for an encounter
                 if(stepsInGrass >= stepsToEncounter)
                 {
+                    partyManager.SetPosition(transform.position);
                     // Load the battle scene
                     SceneManager.LoadScene(BATTLE_SCENE);  
                 }
