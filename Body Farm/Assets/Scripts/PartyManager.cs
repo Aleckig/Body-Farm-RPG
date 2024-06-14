@@ -13,7 +13,7 @@ public class PartyManager : MonoBehaviour
 
     private void Awake()
     {
-        AddMemberToPartyByName(defaultPartyMember.MemberName);
+        //AddMemberToPartyByName(defaultPartyMember.MemberName);
         if (instance != null)
         {
             Destroy(this.gameObject);
