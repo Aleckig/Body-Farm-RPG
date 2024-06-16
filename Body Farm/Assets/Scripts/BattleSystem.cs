@@ -322,6 +322,33 @@ public class BattleSystem : MonoBehaviour
         //sort list in ascending order
         allBattlers.Sort((x, y) => -x.Initiative.CompareTo(y.Initiative));
     }
+
+    public void SelectRunAction()
+    {
+        state = BattleState.Selection;
+        // setting the current members target
+        BattleEntities currentPlayerEntity = playerBattlers[currentPlayer];
+
+        //tell the battle system this member runs away
+        currentPlayerEntity.BattleAction = BattleEntities.Action.Run;
+
+        battleMenu.SetActive(false);
+        // increment through our party members
+        currentPlayer++;
+
+        if (currentPlayer >= playerBattlers.Count) //if all players have selected an action
+        {
+            //Start The Battle
+            StartCoroutine(BattleRoutine());
+
+        }
+        else
+        {
+            enemySelectionMenu.SetActive(false);  // show the battle menu for the next player
+            ShowBattleMenu();
+        }
+
+    }
 }
 
 [System.Serializable]
