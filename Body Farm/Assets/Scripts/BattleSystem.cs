@@ -35,7 +35,10 @@ public class BattleSystem : MonoBehaviour
     private const string ACTION_MESSAGE = "'s Action:";
     private const string WIN_MESSAGE = "Your party won the battle";
     private const string LOSE_MESSAGE = "Your party has been defeated";
+    private const string RUN_MESSAGE = "Run away";
+    private const string FAILED_TO_RUN = "You failed to run away";
     private const int TURN_DURATION = 2;
+    private const int RUN_CHANCE = 50;
     private const string OVERWORLD_SCENE = "TestScene";
 
     // Start is called before the first frame update
@@ -72,6 +75,7 @@ public class BattleSystem : MonoBehaviour
                         break;
                     case BattleEntities.Action.Run:
                         // run
+                        yield return StartCoroutine(RunRoutine());
                         break;
                     default:
                         Debug.Log("Error - incorrect battle action");
@@ -164,6 +168,31 @@ public class BattleSystem : MonoBehaviour
 
 
 
+    }
+
+    private IEnumerator RunRoutine()
+    {
+        if (state == BattleState.Battle)
+        {
+            if(Random.Range(1, 101) >= RUN_CHANCE)
+            {
+                
+                bottomText.text = RUN_MESSAGE;
+                state = BattleState.Run;
+                allBattlers.Clear();
+                yield return new WaitForSeconds(TURN_DURATION);
+                SceneManager.LoadScene(OVERWORLD_SCENE);
+                yield break;
+            }
+            else
+            {
+                bottomText.text = FAILED_TO_RUN;
+                yield return new WaitForSeconds(TURN_DURATION);
+                
+            }
+            
+        }
+        
     }
 
     private void CreatePartyEntities()
