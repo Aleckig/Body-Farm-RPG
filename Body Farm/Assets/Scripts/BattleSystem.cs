@@ -65,7 +65,7 @@ public class BattleSystem : MonoBehaviour
 
         for (int i = 0; i < allBattlers.Count; i++)
         {
-            if (state == BattleState.Battle && allBattlers[i].CurrentHealth >0)
+            if (state == BattleState.Battle && allBattlers[i].CurrentHealth > 0)
 
             {
                 switch (allBattlers[i].BattleAction)
@@ -106,9 +106,7 @@ public class BattleSystem : MonoBehaviour
         {
             BattleEntities currAttacker = allBattlers[i];
             if(allBattlers[currAttacker.Target].CurrentHealth <= 0)
-            //if (allBattlers[currAttacker.Target].IsPlayer == true || currAttacker.Target >= allBattlers.Count)
             {
-
                 currAttacker.SetTarget(GetRandomEnemy());
             }
             BattleEntities currentTarget = allBattlers[currAttacker.Target];
@@ -121,7 +119,7 @@ public class BattleSystem : MonoBehaviour
                 bottomText.text = string.Format("{0} defeated {1}", currAttacker.Name, currentTarget.Name);
                 yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
                 enemyBattlers.Remove(currentTarget);
-                //allBattlers.Remove(currentTarget);
+                
 
                 if (enemyBattlers.Count <= 0)
                 {
@@ -153,7 +151,7 @@ public class BattleSystem : MonoBehaviour
                 bottomText.text = string.Format("{0} defeated {1}", currAttacker.Name, currTarget.Name);
                 yield return new WaitForSeconds(TURN_DURATION);// wait a few seconds
                 playerBattlers.Remove(currTarget);
-                //allBattlers.Remove(currTarget);
+                
 
                 if (playerBattlers.Count <= 0) // if no party members remain
                 {
